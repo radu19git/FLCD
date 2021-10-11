@@ -1,0 +1,16 @@
+a.Special symbols, representing:
+ 1. operators: +, -, *, /, <, <=, =, >=, >
+ 2. separators [], {}, :, ,;
+ 3. reserved words:
+    int
+    if
+    input
+    else
+
+b.identifiers
+ digit::="0"|"1"|...|"9"
+
+c.constants
+ 1.integer:
+        noconst:= "+"no|"-"no|no
+        no:=digit{no}

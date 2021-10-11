@@ -1,0 +1,29 @@
+program ::= declarations instructions
+declarations ::= declaration ";" {declaration ";"}
+declaration ::= type identifier
+type ::= "int"|"float"|"bool"|"char"
+
+instructions ::= statement {statement}
+statement ::= structured_statement | simple_statement | compound_statement
+simple_statement ::= assignment ";" | read_statement ";" | write_statement ";"
+structured_statement ::= for_statement | if_statement | while_statement
+compound_statement ::= "{" instructions "}"
+assignment ::= identifier "=" expression
+expression ::= expression operator term | "(" expression ")" | term
+operator ::= mathematical_operator | relational_operator
+mathematical_operator ::= "+" | "-" | "*" | "/"
+relational_operator ::= "<" | ">" | "<=" | ">=" | "==" | "!="
+term ::= identifier | const
+const ::= int_const | float_const | char_const | bool_const
+for_statement ::= "for" "(" (declaration|assignment) ";" expression ";" assignment ")" statement
+while_statement ::= "while" "(" expression ")" statement
+if_statement ::= "if" "(" expression ")" statement
+read_statement ::= "read" "(" identifier ")"
+write_statement ::= "write" "(" expression ")"
+
+
+
+
+identifier ::= letter | letter{letter}{digit}
+letter ::= "a" | A" | "B" | . ..| "Z"
+digit ::= "0" | "1" |...| "9"

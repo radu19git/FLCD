@@ -1,0 +1,13 @@
+# Max of n numbers
+
+int n;
+int number;
+int max;
+
+max = 0;
+n = 5;
+
+for (int i = 0; i <= n; i++) execute
+    read(number);
+    if (max < number) then
+        max = number;

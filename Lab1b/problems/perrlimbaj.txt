@@ -1,0 +1,5 @@
+int firstErr;
+int secondErr;
+
+firstErr = 11aa;
+secondErr = "for;
