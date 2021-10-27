@@ -1,0 +1,21 @@
+int nb1;
+int nb2;
+int nb3;
+int min;
+
+read(nb1);
+read(nb2);
+read(nb3);
+
+
+if (nb1 <= nb2) {
+    if (nb1 <= nb3)
+        min = nb1;
+    else
+        min = nb3;
+} else {
+    if (nb2 <= nb3)
+        min = nb2;
+    else
+        min = nb3;
+}
