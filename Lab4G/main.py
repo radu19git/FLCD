@@ -107,7 +107,7 @@ class Analyser:
             (re.match("read|write", line), IO),
             (re.match('"[^"]*"', line), StringConstant),
             (re.match("0|([-]?[1-9][0-9]*)", line), IntConstant),
-            (re.match("[a-zA-Z_$][a-zA-Z_$0-9]*", line), Identifier),
+            (re.match("[a-zA-Z_]+[a-zA-Z_$0-9]*", line), Identifier),
         ]
         for match, type_ in matches:
             if match is not None:
@@ -125,7 +125,7 @@ class Analyser:
             if atom in self.__tokens:
                 pif.append(type_(atom, -1))
             else:
-                if not identifier_entry:
+                if not identifier_entry and type is not Identifier:
                     self.__sym_count += 1
                     self.__sym_table.add(atom, type_(atom, self.__sym_count))
                 pif.append(self.__sym_table.get(atom))

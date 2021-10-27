@@ -1,4 +1,4 @@
-int nb1;
+int 9nb1;
 int nb2;
 int nb3;
 int min;
