@@ -1,0 +1,35 @@
+program = "VAR" decllist ";" cmpdstmt
+decllist = declaration | declaration ";" decllist
+
+declaration = IDENTIFIER ":" type
+
+type = "INT" | "COMPLEX" | "CHAR" | "STRING"
+
+
+cmpdstmt = "BEGIN" stmtlist "END"
+
+
+stmtlist = stmt | stmt ";" stmtlist
+stmt = simplstmt | structstmt
+
+simplstmt = assignstmt | iostmt
+assignstmt = IDENTIFIER "=" expression ";"
+
+expression = expression "+" term | expression "-" term |
+             expression "*" term | expression "/" term | term
+
+term = term "*" factor | term "/" factor | factor
+
+factor = "(" expression ")" | IDENTIFIER | CONSTANT
+
+iostmt = ( "INPUT" | "OUTPUT" ) "(" IDENTIFIER ")" ";"
+
+
+structstmt =  ifstmt | forstmt
+
+ifstmt = "IF" condition "THEN" stmtlist ["ELSE" stmtlist]
+forstmt = "FOR" assignstmt ";" condition ";" assignstmt  "DO" stmtlist
+
+condition = expression RELATION expression
+
+RELATION = "<" | "<=" | "=" | "<>" | ">=" | ">"

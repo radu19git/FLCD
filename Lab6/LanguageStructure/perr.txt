@@ -1,0 +1,7 @@
+# Sum of n numbers
+
+VAR x: INT, y: INT;
+BEGIN
+    x = 1q;
+    y = 'if;
+END

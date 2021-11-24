@@ -1,0 +1,10 @@
+# Average of 3 numbers
+
+
+VAR nb1: INT, nb2: INT, nb3: INT, avg:INT;
+BEGIN
+    nb1 = 1;
+    nb2 = 2;
+    nb3 = 3;
+    avg = (nb1 + nb2 + nb3) / 3
+END
