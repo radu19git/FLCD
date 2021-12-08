@@ -1,0 +1,37 @@
+a.Special symbols, representing:
+ - operators: + - * / : < <= = >= >
+ - separators: [] {} ;
+ - reserved words:
+    BEGIN END INT CHAR STRING FLOAT
+    IF ELSE THEN FOR DO
+    INPUT OUTPUT
+
+b.identifiers
+ digit = "0"|"1"|...|"9"
+ letter = "a" | "b" | ... "z" | "A" | "B" | ...| "Z"
+ identifier = letter | letter {letter} {digit}
+
+c.constants
+ 1.INT - rule:
+        noconst = "+" no | "-" no | no
+        no =nozero{digit}
+        nozero = "1" | "2" | ...  | "9"
+
+ 2.CHAR
+    character = 'letter' | 'digit'
+
+ 3.STRING
+      constchar = "string"
+      string = char {string}
+      char = 'letter' | 'digit'
+
+ 4.COMPLEX
+      noconst = "+" no | "-" no | no
+      no1 = digit{no1}
+      no2 = digit{no2}
+      complexno = "(" no1 "," no2 ")"
+      (43, 57)
+
+ 5.BOOLEAN
+      boolean = 0 | 1
+

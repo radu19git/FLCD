@@ -1,0 +1,19 @@
+
+VAR nb1 : INT, nb2 : INT, nb3 : INT, max : INT;
+BEGIN
+nb1 = 1;
+nb2 = 2;
+nb3 = 3;
+max = 0;
+
+IF nb1 >= nb2 THEN
+    IF nb1 >= nb3 THEN
+        max = nb1
+    ELSE
+        max = nb3
+ELSE
+    IF nb2 >= nb3 THEN
+        max = nb2
+    ELSE
+        max = nb3
+END
