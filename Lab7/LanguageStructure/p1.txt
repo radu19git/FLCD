@@ -1,4 +1,3 @@
-
 VAR nb1 : INT, nb2 : INT, nb3 : INT, max : INT;
 BEGIN
 nb1 = 1;

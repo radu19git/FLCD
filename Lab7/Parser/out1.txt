@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "main.py", line 26, in run_tests
+    actions, goto_table = parser.build_table(collection)
+  File "C:\Users\flutu\OneDrive\Desktop\FLCD\FLCD\Lab7\Parser\Parser.py", line 173, in build_table
+    self.__validate_state(state)
+  File "C:\Users\flutu\OneDrive\Desktop\FLCD\FLCD\Lab7\Parser\Parser.py", line 143, in __validate_state
+    raise ShiftReduceConflict(f"State that contains shiftable and fully shifted elements: {state}")
+Parser.ShiftReduceConflict: State that contains shiftable and fully shifted elements: {('S', ((), ('0', 'B'))), ('B', (('1',), ())), ('S', ((), ('1', 'A'))), ('B', (('1',), ('S',)))}

@@ -3,19 +3,23 @@ import re
 from typing import List
 import string
 
+
 @dataclass
 class Term:
     name: str
+
     def __eq__(self, other):
         if isinstance(other, str):
             return self.name == other
         elif isinstance(other, Term):
             return self.name == other.name
 
+
 @dataclass
 class NonTerminal(Term):
     def __eq__(self, other):
         return super().__eq__(other)
+
 
 @dataclass
 class Terminal(Term):
@@ -27,6 +31,7 @@ class Terminal(Term):
 class Rule:
     input: List[Term]
     outputs: List[List[Term]]
+
 
 @dataclass
 class Grammar:
@@ -55,21 +60,40 @@ class Grammar:
                     if out == output:
                         return production_number
         return -1
+
+    def get_rule(self, index: int) -> Rule:
+        production_number = 0
+        for r in self.rules:
+            for output in r.outputs:
+                production_number += 1
+                if production_number == index:
+                    return Rule(r.input, [output])
+
+
 class TermParser:
+    def __init__(self, nonterminals: List[str], terminals: List[str]):
+        self.nonterminals = nonterminals
+        self.terminals = terminals
+
     def parse(self, char: str) -> Term:
-        if char.isupper():
+        if char in self.nonterminals:
             return NonTerminal(char)
-        else:
+        elif char in self.terminals:
             return Terminal(char)
+        else:
+            raise Exception(f"Invalid character {char}, did you forget to add it to the alphabet?")
 
 
 class RuleParser:
+    def __init__(self, nonterminals: List[str], terminals: List[str]):
+        self.nonterminals = nonterminals
+        self.terminals = terminals
+
     def __parse_term(self, char: str):
-        return TermParser().parse(char)
+        return TermParser(self.nonterminals, self.terminals).parse(char)
 
     def __parse_output(self, sequence):
         return [*map(lambda c: self.__parse_term(c), sequence)]
-
 
     def parse(self, line):
         chunks = re.split("->", line)
@@ -89,18 +113,18 @@ class GrammarParser:
         return [*map(lambda t: Terminal(t), line.split())]
 
     def __parse_rule(self, line) -> Rule:
-        return RuleParser().parse(line)
+        return RuleParser(self.nonterminals, self.terminals).parse(line)
 
     def __parse_rules(self, lines) -> List[Rule]:
         return [*map(lambda l: self.__parse_rule(l), lines)]
 
     def parse(self, file) -> Grammar:
         lines = file.readlines()
-        nonterminals = self.__parse_nonterminals(lines[0])
-        terminals = self.__parse_terminals(lines[1])
+        self.nonterminals = self.__parse_nonterminals(lines[0])
+        self.terminals = self.__parse_terminals(lines[1])
         start_symbol = NonTerminal(lines[2].strip())
         rules = self.__parse_rules(lines[3:])
-        return Grammar(nonterminals, terminals, start_symbol, rules)
+        return Grammar(self.nonterminals, self.terminals, start_symbol, rules)
 
 
 menu_prompt = """1. Print nonterminals
@@ -108,6 +132,7 @@ menu_prompt = """1. Print nonterminals
 3. Print productions
 4. Check if the grammar is context free
 0. Exit"""
+
 
 class Menu:
     def __init__(self, grammar):
@@ -121,9 +146,9 @@ class Menu:
             if opt == 0:
                 break
             if opt == 1:
-                print(', '.join(map(lambda n: n.name, self.grammar.nonterminals)))
+                print(", ".join(map(lambda n: n.name, self.grammar.nonterminals)))
             elif opt == 2:
-                print(', '.join(map(lambda t: t.name, self.grammar.terminals)))
+                print(", ".join(map(lambda t: t.name, self.grammar.terminals)))
             elif opt == 3:
                 for rule in self.grammar.rules:
                     print(rule)
@@ -134,9 +159,10 @@ class Menu:
                     print("Not context free")
             input("\nPress any key to continue...")
 
+
 def test():
     with open("g1.test.txt", "r") as f:
-        assert NonTerminal('1') == NonTerminal('1')
+        assert NonTerminal("1") == NonTerminal("1")
         grammar = GrammarParser().parse(f)
         assert grammar.nonterminals
         assert grammar.terminals
@@ -156,7 +182,7 @@ def test():
     print("passed")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test()
     with open("g1.test.txt", "r") as f:
         grammar = GrammarParser().parse(f)

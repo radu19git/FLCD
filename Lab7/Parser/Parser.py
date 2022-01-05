@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List, Set
 
 from Grammar import Grammar, Rule, NonTerminal, Terminal, TermParser
 
@@ -11,12 +12,50 @@ def state_as_string(state):
     result += '}'
     return result
 
-class ShiftAction:
+class ParseError(Exception):
     pass
+
+class ShiftAction:
+    def do(self, working, input_stack, output, goto_table, grammar):
+        sm = working[-1]
+        head = input_stack[0]
+        next_state = goto_table[sm][head]
+        if next_state is not None:
+            working += [head, next_state]
+            input_stack.pop(0)
+        else:
+            raise ParseError(f"No transition from state {sm} through terminal {head}")
 
 @dataclass
 class ReduceAction:
     production_rule: int
+
+    def __matches_production_rule(self, stack_head, rule):
+        return stack_head == [*map(lambda x: x.name, rule.outputs[0])]
+
+    def do(self, working, input_stack, output, goto_table, grammar):
+        rule = grammar.get_rule(self.production_rule)
+        p = len(rule.outputs[0])
+        previous_state = working[-2*p-1]
+        A = rule.input[0].name
+        sj = goto_table[previous_state][A]
+
+        if self.__matches_production_rule(working[-2*p:-1:2], rule) and sj is not None:
+            if sj is not None:
+                for i in range(2*p):
+                    working.pop()
+                working.append(A)
+                working.append(sj)
+                output.append(self.production_rule)
+            else:
+                raise ParseError(f"No transition from state {previous_state} through nonterminal {A}")
+        else:
+            raise ParseError(f"{working[-p-1:-1]} does not match production rule {A} -> {[*map(lambda x: x.name, rule.outputs[0])]}")
+
+class AcceptAction:
+    def do(self, working, input_stack, output, goto_table, grammar):
+        if input_stack == ["$"] and working[0] == "$" and isinstance(working[1], int):
+            raise ParseError("Pattern is not recognized by parser")
 
 class LR0Parser:
     def __init__(self, grammar: Grammar):
@@ -70,20 +109,18 @@ class LR0Parser:
         s0 = self.closure({("S'", (tuple(), (self.grammar.start_symbol.name,)))})
         c = [s0]
         c1 = [s0]
-        goto_table = [self.make_goto_row()]
+
         while True:
             for i, state in enumerate(c):
                 for x in self.grammar.nonterminals + self.grammar.terminals:
                     new_state = self.goto(state, x.name)
                     if len(new_state) > 0 and new_state not in c1:
                         print(f"new state = c1[{len(c1)}] = goto(c[{i}], {x.name}) = {state_as_string(new_state)}")
-                        goto_table[i][x.name] = len(goto_table)
                         c1.append(new_state)
-                        goto_table.append(self.make_goto_row())
             if c1 == c:
                 break
             c = c1
-        return c, goto_table
+        return c
 
     def __element_fully_shifted(self, element):
         nonterm, stacks = element
@@ -119,33 +156,58 @@ class LR0Parser:
         [rule] = list(state)
         nonterm, stacks = rule
         working, _input = stacks
-        term_parser = TermParser()
+        term_parser = TermParser(self.grammar.nonterminals, self.grammar.terminals)
         output = [*map(lambda t: term_parser.parse(t), working + _input)]
 
         return Rule([NonTerminal(nonterm)], [output])
 
-    def build_table(self, collection, goto_table):
+    def __is_accept_state(self, state):
+        return state == {("S'", ((self.grammar.start_symbol.name,), tuple()))}
+
+    def build_table(self, collection: List[Set]):
         actions = []
-        for state in collection:
+        goto_table = []
+        for i in range(len(collection)):
+            goto_table.append(self.make_goto_row())
+        for i, state in enumerate(collection):
             self.__validate_state(state)
             if self.__is_shift_state(state):
                 actions.append(ShiftAction())
             elif self.__is_reduce_state(state):
                 rule = self.__convert_to_grammar_rule(state)
                 pn = self.grammar.find_rule(rule)
-                if pn < 0:
-                    import ipdb
-                    ipdb.set_trace()
-                actions.append(ReduceAction(pn))
+                if pn < 0 and self.__is_accept_state(state):
+                    actions.append(AcceptAction())
+                else:
+                    actions.append(ReduceAction(pn))
 
-        import ipdb
-        ipdb.set_trace()
-        return actions
+            for x in self.grammar.nonterminals + self.grammar.terminals:
+                other_state = self.goto(state, x)
+                if len(other_state) == 0:
+                    continue
+                try:
+                    goto_table[i][x.name] = collection.index(other_state)
+                except ValueError as e:
+                    pass
+        return actions, goto_table
+
+    def parse(self, sequence, actions, goto_table):
+        working, input_stack, result = ["$", 0], list(sequence + "$"), []
+
+        while True:
+            current_action = actions[working[-1]]
+            if input_stack == ["$"]:
+                if isinstance(current_action, AcceptAction):
+                    return result
+                elif not isinstance(current_action, ReduceAction):
+                    raise ParseError("Pattern is not recognized by parser")
+            current_action.do(working, input_stack, result, goto_table, self.grammar)
 
 
-class ShiftReduceConflict(Exception):
+
+class ShiftReduceConflict(ParseError):
     pass
 
 
-class ReduceReduceConflict(Exception):
+class ReduceReduceConflict(ParseError):
     pass

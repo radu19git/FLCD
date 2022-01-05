@@ -1,0 +1,7 @@
+{'S': 1, 'A': 2, 'a': 3, 'b': 4}
+{'S': None, 'A': None, 'a': None, 'b': None}
+{'S': None, 'A': 5, 'a': 3, 'b': 4}
+{'S': None, 'A': 6, 'a': 3, 'b': 4}
+{'S': None, 'A': None, 'a': None, 'b': None}
+{'S': None, 'A': None, 'a': None, 'b': None}
+{'S': None, 'A': None, 'a': None, 'b': None}
